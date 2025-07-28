@@ -15,20 +15,6 @@ public class Main {
     public static void main(String[] args)
     {
         InputCommand inputCommand = new InputCommand(args);
-
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Введите первое число: ");
-
-        String inputNumber1 = scanner.nextLine();
-        int number1 = Integer.parseInt(inputNumber1);
-
-        System.out.println("Введите второе число: ");
-
-        String inputNumber2 = scanner.nextLine();
-        int number2 = Integer.parseInt(inputNumber2);
-
-        System.out.println("Сумма = " + (number1 + number2));
     }
 
 }

@@ -4,8 +4,8 @@ import java.util.Arrays;
 
 public class InputCommand {
 
-    /** Аргументы командной строки которые не удалось обработать */
-    private String[] unprocessedArgs = {};
+    /** Позиции и наименования файлов из аргументов командной строки */
+    private String[] listFilesPosition = {};
 
     /** Файлы с результатами должны быть перезаписаны? */
     private boolean isOutRewrite = true;
@@ -22,15 +22,26 @@ public class InputCommand {
     /** Относительный путь до результирующих файлов от директории с результатами по умолчанию  */
     private String outPath;
 
-    /**  */
+    /** Позиция последнего флага из командной строки */
     private int lastFlagIndex = -1;
 
+    /**
+     * Инициализация объекта входной команды и проверка входных данных
+     *
+     * @param args Аргументы из командной строки
+     */
     public InputCommand(String[] args) {
         this.setParameters(args);
+        this.checkParameters();
 
-        System.out.println(Arrays.toString(this.unprocessedArgs));
+        System.out.println(Arrays.toString(this.listFilesPosition));
     }
 
+    /**
+     * Установление параметров из командной строки в свойства класса
+     *
+     * @param args Аргументы из командной строки
+     */
     private void setParameters(String[] args) {
 
         boolean nextElementContinue = false;
@@ -67,9 +78,16 @@ public class InputCommand {
                     this.setOutPrefix(args[i + 1]);
                     break;
                 default:
-                    this.addElementUnprocessedArg(String.valueOf(i), element);
+                    this.addFileToFilePositionList(String.valueOf(i), element);
             }
         }
+    }
+
+    /**
+     * Проверка значений свойств класса и формирование сообщения пользователю при наличии ошибок ввода команды
+     */
+    private void checkParameters() {
+
     }
 
     public boolean isOutRewrite() {
@@ -112,15 +130,23 @@ public class InputCommand {
         this.outPath = outPath;
     }
 
-    public String[] unprocessedArgs() {
-        return this.unprocessedArgs;
+    public String[] listFilesPosition() {
+        return this.listFilesPosition;
     }
 
-    public void addElementUnprocessedArg(String key, String unprocessedArg) {
-        String[] newUnprocessedArgs = Arrays.copyOf(this.unprocessedArgs, this.unprocessedArgs.length + 2);
-        newUnprocessedArgs[newUnprocessedArgs.length - 2] = key;
-        newUnprocessedArgs[newUnprocessedArgs.length - 1] = unprocessedArg;
-        this.unprocessedArgs = newUnprocessedArgs;
+    /**
+     * Формирование списка с позициями и наименованиями файлов
+     *
+     * @param key Позиция элемента в массиве аргументов командной строки
+     * @param fileName Наименование файла
+     *
+     * @example [4, in1.txt, 5, in2.txt]
+     */
+    public void addFileToFilePositionList(String key, String fileName) {
+        String[] newListFilesPosition = Arrays.copyOf(this.listFilesPosition, this.listFilesPosition.length + 2);
+        newListFilesPosition[newListFilesPosition.length - 2] = key;
+        newListFilesPosition[newListFilesPosition.length - 1] = fileName;
+        this.listFilesPosition = newListFilesPosition;
     }
 
     public int getLastFlagIndex() {
