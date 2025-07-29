@@ -2,41 +2,72 @@ package org.SortVariables;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
+/**
+ * Класс для интерпретации и проверки команды
+ */
 public class InputCommand {
 
-    /** Позиции и наименования файлов из аргументов командной строки */
+    /**
+     * Позиции и наименования файлов из аргументов командной строки
+     */
     private String[] listFilesPosition = {};
 
-    /** Список сообщений с ошибками */
+    /**
+     * Список сообщений с ошибками
+     */
     private String[] errorMessages = {};
 
-    /** Есть ли ошибки в веденной команде */
+    /**
+     * Есть ли ошибки в веденной команде
+     */
     private boolean isHasErrors = false;
 
-    /** Файлы с результатами должны быть перезаписаны? */
+    /**
+     * Файлы с результатами должны быть перезаписаны?
+     */
     private boolean isOutRewrite = true;
 
-    /** Нужно ли вывести краткую статистику? */
+    /**
+     * Нужно ли вывести краткую статистику?
+     */
     private boolean isBriefStat = false;
 
-    /** Нужно ли вывести полную статистику? */
+    /**
+     * Нужно ли вывести полную статистику?
+     */
     private boolean isFullStat = false;
 
-    /** Префикс в названии для результирующих файлов */
+    /**
+     * Префикс в названии для результирующих файлов
+     */
     private String outPrefix;
 
-    /** Регулярное выражение для проверки префикса результирующих файлов */
-    final String outPrefixRegex = "/^[^\\x00-\\x1F\\\\\\/:\\*\\?\"<>\\|]{1,50}$/";
+    /**
+     * Регулярное выражение для проверки префикса результирующих файлов
+     */
+    final String outPrefixRegex = "^[^\\x00-\\x1F\\\\\\/:\\*\\?\"<>\\|]{1,50}$";
 
-    /** Относительный путь до результирующих файлов от директории с результатами по умолчанию  */
+    /**
+     * Относительный путь до результирующих файлов от директории с результатами по умолчанию
+     */
     private String outPath;
 
-    /** Регулярное выражение для проверки пути до результирующих файлов */
-    final String outPathRegex = "/^\\/(?:[^<>:\"\\/\\\\|?*\\x00-\\x1F]{1,100}\\/?)+$/";
+    /**
+     * Регулярное выражение для проверки пути до результирующих файлов
+     */
+    final String outPathRegex = "^\\/(?:[^<>:\"\\/\\\\|?*\\x00-\\x1F]{1,100}\\/?)+$";
 
-    /** Позиция последнего флага из командной строки */
+    /**
+     * Позиция последнего флага из командной строки
+     */
     private int lastFlagIndex = -1;
+
+    /**
+     * Регулярное выражение для проверки названия txt файла
+     */
+    final String txtFilePattern = "^[^\\\\\\/:*?\"<>|]+\\.txt$";
 
     /**
      * Инициализация объекта входной команды и проверка входных данных
@@ -44,8 +75,16 @@ public class InputCommand {
      * @param args Аргументы из командной строки
      */
     public InputCommand(String[] args) {
-        this.setParameters(args);
+        this.parseInputArgs(args);
         this.checkParameters();
+
+        if (this.errorMessages.length > 0) {
+            for (int i = 0; i < this.errorMessages.length; i += 1) {
+                System.out.println(this.errorMessages[i]);
+            }
+
+            System.exit(1);
+        }
 
         System.out.println(Arrays.toString(this.listFilesPosition));
     }
@@ -55,7 +94,7 @@ public class InputCommand {
      *
      * @param args Аргументы из командной строки
      */
-    private void setParameters(String[] args) {
+    private void parseInputArgs(String[] args) {
 
         boolean nextElementContinue = false;
 
@@ -100,34 +139,142 @@ public class InputCommand {
      * Проверка значений свойств класса и формирование сообщения пользователю при наличии ошибок ввода команды
      */
     private void checkParameters() {
-        if (this.isBriefStat && this.isFullStat) {
-            this.isHasErrors = true;
-            this.addMessageErrorMessageList("Разрешено одновременное использование только одного из флагов:");
-            this.addMessageErrorMessageList("-s: для получения краткой статистики;");
-            this.addMessageErrorMessageList("-f: для получения полной статистики.");
+        this.checkSimultaneousStatisticUse();
+        this.checkOutPath();
+        this.checkOutPrefix();
+        this.checkInputFileExists();
+        this.checkFileNamePosition();
+        this.checkFileTypes();
+        this.checkDuplicateFiles();
+    }
+
+    /**
+     * Проверить на одновременное использование флагов краткой и подробной статистики
+     */
+    private void checkSimultaneousStatisticUse() {
+        if (!this.isBriefStat || !this.isFullStat) {
+            return;
         }
 
+        this.isHasErrors = true;
+        this.addMessageErrorMessageList("Разрешено одновременное использование только одного из флагов:");
+        this.addMessageErrorMessageList("-s: для получения краткой статистики;");
+        this.addMessageErrorMessageList("-f: для получения полной статистики.");
+        this.addMessageErrorMessageList("");
+
+    }
+
+    /**
+     * Проверить на корректность указанный путь для создания результирующих файлов
+     */
+    private void checkOutPath() {
         Pattern outPathPattern = Pattern.compile(this.outPathRegex);
+        Matcher outPathmatcher = outPathPattern.matcher(this.outPrefix);
 
-        if (!outPathPattern.matcher(this.outPath).matches()) {
-            this.isHasErrors = true;
-            this.addMessageErrorMessageList("Ошибка в пути для создания результирующих файлов (после флага -o).");
-            this.addMessageErrorMessageList("Возможные причины:");
-            this.addMessageErrorMessageList("Запрещенные символы: <, >, :, \", \\, |, ?, *;");
-            this.addMessageErrorMessageList("Пустой путь - / или несколько / подряд;");
-            this.addMessageErrorMessageList("Большое количество символов (больше 100).");
+        if ((this.outPath == null) || outPathmatcher.matches()) {
+            return;
         }
 
-        Pattern outPrefixPattern = Pattern.compile(this.outPrefixRegex);
+        this.isHasErrors = true;
+        this.addMessageErrorMessageList("Ошибка в пути для создания результирующих файлов (после флага -o).");
+        this.addMessageErrorMessageList("Возможные причины:");
+        this.addMessageErrorMessageList("Запрещенные символы: <, >, :, \", \\, |, ?, *;");
+        this.addMessageErrorMessageList("Пустой путь - / или несколько / подряд;");
+        this.addMessageErrorMessageList("Количество символов больше 100.");
+        this.addMessageErrorMessageList("");
 
-        if (!outPrefixPattern.matcher(this.outPrefix).matches()) {
+    }
+
+    /**
+     * Проверить на корректность указанный префикс для результирующих файлов
+     */
+    private void checkOutPrefix() {
+        Pattern outPrefixPattern = Pattern.compile(this.outPrefixRegex);
+        Matcher outPrefixMatcher = outPrefixPattern.matcher(this.outPrefix);
+
+        if ((this.outPrefix == null) || outPrefixMatcher.matches()) {
+            return;
+        }
+
+        this.isHasErrors = true;
+        this.addMessageErrorMessageList("Ошибка в префиксе для создания результирующих файлов (после флага -p).");
+        this.addMessageErrorMessageList("Возможные причины:");
+        this.addMessageErrorMessageList("Запрещенные символы: <, >, :, \", /, \\, |, ?, *;");
+        this.addMessageErrorMessageList("Количество символов больше 50.");
+        this.addMessageErrorMessageList("");
+    }
+
+    /**
+     * Проверить на наличие название вводных текстовых файлов
+     */
+    private void checkInputFileExists() {
+        if (this.listFilesPosition.length != 0) {
+            return;
+        }
+
+        this.isHasErrors = true;
+        this.addMessageErrorMessageList("Укажите названия текстовых файлов, которые нужно обработать.");
+        this.addMessageErrorMessageList("");
+
+    }
+
+    /**
+     * Проверить, на каких позициях находятся имена входных файлов в командной строке
+     */
+    private void checkFileNamePosition() {
+        for (int i = 0; i < this.listFilesPosition.length; i += 2) {
+
+            if (Integer.parseInt(this.listFilesPosition[i]) > this.getLastFlagIndex()) {
+                continue;
+            }
+
             this.isHasErrors = true;
-            this.addMessageErrorMessageList("Ошибка в префиксе для создания результирующих файлов (после флага -p).");
-            this.addMessageErrorMessageList("Возможные причины:");
-            this.addMessageErrorMessageList("Запрещенные символы: <, >, :, \", /, \\, |, ?, *;");
-            this.addMessageErrorMessageList("Большое количество символов (больше 50).");
+            this.addMessageErrorMessageList("Указанное название файла: " + this.listFilesPosition[i + 1] + " должно находиться после использования флагов и их аргументов.");
+            this.addMessageErrorMessageList("");
+
         }
     }
+
+    /**
+     * Проверить тип входных файлов
+     */
+    private void checkFileTypes() {
+        Pattern txtFilePattern = Pattern.compile(this.txtFilePattern);
+
+        for (int i = 1; i < this.listFilesPosition.length; i += 2) {
+            Matcher txtFileMatcher = txtFilePattern.matcher(this.listFilesPosition[i]);
+
+            if (txtFileMatcher.matches()) {
+                continue;
+            }
+
+            this.isHasErrors = true;
+            this.addMessageErrorMessageList("Указанный файл: " + this.listFilesPosition[i] + " не является текстовым документом.");
+            this.addMessageErrorMessageList("");
+
+        }
+    }
+
+    /**
+     * Проверить есть ли дублирующиеся названия в файлах
+     */
+    private void checkDuplicateFiles() {
+        Pattern txtFilePattern = Pattern.compile(this.txtFilePattern);
+
+        for (int i = 1; i < this.listFilesPosition.length; i += 2) {
+            Matcher txtFileMatcher = txtFilePattern.matcher(this.listFilesPosition[i]);
+
+            if (txtFileMatcher.matches()) {
+                continue;
+            }
+
+            this.isHasErrors = true;
+            this.addMessageErrorMessageList("Указанный файл: " + this.listFilesPosition[i] + " не является текстовым документом.");
+            this.addMessageErrorMessageList("");
+
+        }
+    }
+
 
     public boolean isOutRewrite() {
         return this.isOutRewrite;
@@ -176,9 +323,8 @@ public class InputCommand {
     /**
      * Формирование списка с позициями и наименованиями файлов
      *
-     * @param key Позиция элемента в массиве аргументов командной строки
+     * @param key      Позиция элемента в массиве аргументов командной строки
      * @param fileName Наименование файла
-     *
      * @example [4, in1.txt, 5, in2.txt]
      */
     public void addFileToFilePositionList(String key, String fileName) {

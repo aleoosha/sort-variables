@@ -14,7 +14,13 @@ public class Main {
 
     public static void main(String[] args)
     {
-        InputCommand inputCommand = new InputCommand(args);
+        try {
+            InputCommand inputCommand = new InputCommand(args);
+        } catch (OutOfMemoryError error) {
+            System.err.println("Ошибка нехватки памяти: " + error.getMessage());
+            error.printStackTrace();
+            System.exit(1);
+        }
     }
 
 }
