@@ -11,7 +11,7 @@ import java.math.BigInteger;
  */
 public class InputFile {
 
-    final String inputFileFolder = "/inputFiles/";
+    final String INPUT_FILES_FOLDER = "/input-files/";
 
     /**
      * Список сообщений с ошибками
@@ -37,7 +37,7 @@ public class InputFile {
      */
     public InputFile(String fileName) {
         String currentDirectory = System.getProperty("user.dir");
-        String filePath = currentDirectory + this.inputFileFolder + fileName;
+        String filePath = currentDirectory + this.INPUT_FILES_FOLDER + fileName;
 
         try (Scanner scanner = new Scanner(new File(filePath))) {
             this.setFileValuesWithType(scanner);

@@ -1,15 +1,8 @@
 package org.SortVariables;
 
+import java.util.Arrays;
+
 public class Main {
-
-    /** Название файла вывода данных для целых значений */
-    final String INT_FILE_NAME = "integers.txt";
-
-    /** Название файла вывода данных для значений с плавающей точкой */
-    final String FLOAT_FILE_NAME = "floats.txt";
-
-    /** Название файла вывода данных для стоковых значений */
-    final String STRING_FILE_NAME = "strings.txt";
 
     public static void main(String[] args)
     {
@@ -21,15 +14,15 @@ public class Main {
                 System.exit(1);
             }
 
-            String[] listFilesPosition = inputCommand.getListFilesPosition();
+            InputFile[] inputFilesList = getInputFilesList(inputCommand);
 
-            for (int i = 1; i < listFilesPosition.length; i += 2) {
-                InputFile newInputFile = new InputFile(listFilesPosition[i]);
+            OutputFile intOutputFile = new OutputFile("int", inputCommand, inputFilesList);
+            OutputFile stringOutputFile = new OutputFile("string", inputCommand, inputFilesList);
+            OutputFile floatOutputFile = new OutputFile("float", inputCommand, inputFilesList);
 
-                if (newInputFile.getIsHasErrors()) {
-                    sendErrorMessages(newInputFile.getErrorMessages());
-                }
-            }
+            intOutputFile.create(inputCommand.getIsOutRewrite());
+            stringOutputFile.create(inputCommand.getIsOutRewrite());
+            floatOutputFile.create(inputCommand.getIsOutRewrite());
 
         } catch (OutOfMemoryError error) {
             System.err.println("Ошибка нехватки памяти: " + error.getMessage());
@@ -46,6 +39,31 @@ public class Main {
         for (String errorMessage : errorMessages) {
             System.out.println(errorMessage);
         }
+    }
+
+    /**
+     * Получить список объектов входных файлов
+     *
+     * @param inputCommand Объект входной команды
+     * @return список объектов входных файлов
+     */
+    private static InputFile[] getInputFilesList(InputCommand inputCommand) {
+        String[] listFilesPosition = inputCommand.getListFilesPosition();
+
+        InputFile[] inputFilesList = new InputFile[0];
+
+        for (int i = 1; i < listFilesPosition.length; i += 2) {
+            InputFile newInputFile = new InputFile(listFilesPosition[i]);
+            InputFile[] newInputFilesList = Arrays.copyOf(inputFilesList, inputFilesList.length + 1);
+            newInputFilesList[newInputFilesList.length - 1] = newInputFile;
+            inputFilesList = newInputFilesList;
+
+            if (newInputFile.getIsHasErrors()) {
+                sendErrorMessages(newInputFile.getErrorMessages());
+            }
+        }
+
+        return inputFilesList;
     }
 
 }

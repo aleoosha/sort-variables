@@ -42,22 +42,22 @@ public class InputCommand {
     /**
      * Префикс в названии для результирующих файлов
      */
-    private String outPrefix;
+    private String outPrefix = "";
 
     /**
      * Регулярное выражение для проверки префикса результирующих файлов
      */
-    final String outPrefixRegex = "^[^\\x00-\\x1F\\\\\\/:\\*\\?\"<>\\|]{1,50}$";
+    final String OUT_PREFIX_REGEX = "^[^\\x00-\\x1F\\\\\\/:\\*\\?\"<>\\|]{1,50}$";
 
     /**
      * Относительный путь до результирующих файлов от директории с результатами по умолчанию
      */
-    private String outPath;
+    private String outPath = "";
 
     /**
      * Регулярное выражение для проверки пути до результирующих файлов
      */
-    final String outPathRegex = "^\\/(?:[^<>:\"\\/\\\\|?*\\x00-\\x1F]{1,100}\\/?)+$";
+    final String OUT_PATH_REGEX = "^\\/(?:[^<>:\"\\/\\\\|?*\\x00-\\x1F]{1,100}\\/?)+$";
 
     /**
      * Позиция последнего флага из командной строки
@@ -67,7 +67,7 @@ public class InputCommand {
     /**
      * Регулярное выражение для проверки названия txt файла
      */
-    final String txtFilePattern = "^[^\\\\\\/:*?\"<>|]+\\.txt$";
+    final String TXT_FILE_REGEX = "^[^\\\\\\/:*?\"<>|]+\\.txt$";
 
     /**
      * Инициализация объекта входной команды и проверка входных данных
@@ -160,11 +160,11 @@ public class InputCommand {
     private void checkOutPath() {
         String outPath = this.getOutPath();
 
-        if (outPath == null) {
+        if (outPath.isEmpty()) {
             return;
         }
 
-        Pattern outPathPattern = Pattern.compile(this.outPathRegex);
+        Pattern outPathPattern = Pattern.compile(this.OUT_PATH_REGEX);
         Matcher outPathMatcher = outPathPattern.matcher(outPath);
 
         if (outPathMatcher.matches()) {
@@ -187,11 +187,11 @@ public class InputCommand {
     private void checkOutPrefix() {
         String outPrefix = this.getOutPrefix();
 
-        if (outPrefix == null) {
+        if (outPrefix.isEmpty()) {
             return;
         }
 
-        Pattern outPrefixPattern = Pattern.compile(this.outPrefixRegex);
+        Pattern outPrefixPattern = Pattern.compile(this.OUT_PREFIX_REGEX);
         Matcher outPrefixMatcher = outPrefixPattern.matcher(outPrefix);
 
         if (outPrefixMatcher.matches()) {
@@ -246,7 +246,7 @@ public class InputCommand {
     private void checkFileTypes() {
         String[] listFilesPosition = this.getListFilesPosition();
 
-        Pattern txtFilePattern = Pattern.compile(this.txtFilePattern);
+        Pattern txtFilePattern = Pattern.compile(this.TXT_FILE_REGEX);
 
         for (int i = 1; i < listFilesPosition.length; i += 2) {
             Matcher txtFileMatcher = txtFilePattern.matcher(listFilesPosition[i]);
