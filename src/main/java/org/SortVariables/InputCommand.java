@@ -78,17 +78,6 @@ public class InputCommand {
         this.parseInputArgs(args);
         this.checkParameters();
 
-        errorMessages = this.getErrorMessages();
-
-        if (getIsHasErrors()) {
-            for (int i = 0; i < errorMessages.length; i += 1) {
-                System.out.println(errorMessages[i]);
-            }
-
-            System.exit(1);
-        }
-
-        System.out.println(Arrays.toString(this.listFilesPosition));
     }
 
     /**
@@ -172,10 +161,14 @@ public class InputCommand {
     private void checkOutPath() {
         outPath = this.getOutPath();
 
+        if (outPath == null) {
+            return;
+        }
+
         Pattern outPathPattern = Pattern.compile(this.outPathRegex);
         Matcher outPathMatcher = outPathPattern.matcher(outPath);
 
-        if ((outPath == null) || outPathMatcher.matches()) {
+        if (outPathMatcher.matches()) {
             return;
         }
 
@@ -195,10 +188,14 @@ public class InputCommand {
     private void checkOutPrefix() {
         outPrefix = this.getOutPrefix();
 
+        if (outPrefix == null) {
+            return;
+        }
+
         Pattern outPrefixPattern = Pattern.compile(this.outPrefixRegex);
         Matcher outPrefixMatcher = outPrefixPattern.matcher(outPrefix);
 
-        if ((outPrefix == null) || outPrefixMatcher.matches()) {
+        if (outPrefixMatcher.matches()) {
             return;
         }
 
@@ -272,19 +269,12 @@ public class InputCommand {
     private void checkDuplicateFiles() {
         listFilesPosition = this.getListFilesPosition();
 
-        Pattern txtFilePattern = Pattern.compile(this.txtFilePattern);
+        if (!ArrayHelper.hasDuplicates(listFilesPosition)) { return; }
 
-        for (int i = 1; i < listFilesPosition.length; i += 2) {
-            Matcher txtFileMatcher = txtFilePattern.matcher(listFilesPosition[i]);
-
-            if (txtFileMatcher.matches()) {
-                continue;
-            }
-
-            this.setIsHasErrors(true);
-            this.addMessageErrorMessageList("Указанный файл: " + listFilesPosition[i] + " не является текстовым документом.");
-            this.addMessageErrorMessageList("");
-        }
+        this.setIsHasErrors(true);
+        this.addMessageErrorMessageList("В команде присутствуют дублирующиеся названия файлов.");
+        this.addMessageErrorMessageList("Если вы хотите обработать несколько файлов с одинаковыми данными - задайте им разные называния");
+        this.addMessageErrorMessageList("");
     }
 
     public boolean getIsOutRewrite() {
