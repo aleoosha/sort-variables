@@ -77,7 +77,6 @@ public class InputCommand {
     public InputCommand(String[] args) {
         this.parseInputArgs(args);
         this.checkParameters();
-
     }
 
     /**
