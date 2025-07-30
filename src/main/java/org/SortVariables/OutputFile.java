@@ -1,43 +1,60 @@
 package org.SortVariables;
 
 import java.util.Arrays;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
 public class OutputFile {
 
-    /** Название файла вывода данных для целых значений */
+    /**
+     * Название файла вывода данных для целых значений
+     */
     final String INT_FILE_NAME = "integers.txt";
 
-    /** Название файла вывода данных для значений с плавающей точкой */
+    /**
+     * Название файла вывода данных для значений с плавающей точкой
+     */
     final String FLOAT_FILE_NAME = "floats.txt";
 
-    /** Название файла вывода данных для стоковых значений */
+    /**
+     * Название файла вывода данных для стоковых значений
+     */
     final String STRING_FILE_NAME = "strings.txt";
 
     final String OUTPUT_FILE_FOLDER = "/result-files";
 
-    /** Название файла */
+    /**
+     * Название файла
+     */
     private String name;
 
-    /** Абсолютный путь до директории с результатами */
+    /**
+     * Абсолютный путь до директории с результатами
+     */
     private String path;
 
-    /** Добавочный путь от директории с результатами до результирующего файла */
+    /**
+     * Добавочный путь от директории с результатами до результирующего файла
+     */
     private String addedPath;
 
-    /** Файл пустой? */
+    /**
+     * Файл пустой?
+     */
     private boolean isEmpty;
 
-    /** Данные для записи в файл */
+    /**
+     * Данные для записи в файл
+     */
     private String[] data = {};
 
     /**
      * Инициализация данных выходного файла
      *
-     * @param type Тип выходного файла "int", "float", "string"
-     * @param inputCommand Данные из входной команды
+     * @param type          Тип выходного файла "int", "float", "string"
+     * @param inputCommand  Данные из входной команды
      * @param inputFileList Список с данными каждого входного файла
      */
     public OutputFile(String type, InputCommand inputCommand, InputFile[] inputFileList) {
@@ -122,13 +139,45 @@ public class OutputFile {
         File resultDirectory = new File(String.valueOf(directoryPath));
 
         if (resultDirectory.exists()) {
+
             File file = new File(resultDirectory, this.getName());
-            try (FileWriter writer = new FileWriter(file)) {
-                for (String line : this.getData()) {
-                    writer.write(line + System.lineSeparator());
+
+            if (!file.exists()) {
+
+                try (FileWriter writer = new FileWriter(file)) {
+                    for (String line : this.getData()) {
+                        writer.write(line + System.lineSeparator());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+
+            } else if (isRewrite) {
+
+                if (!file.delete()) {
+                    System.out.println("Не удалось удалить file: " + file.toString());
+                    System.out.println();
+                    System.exit(1);
+                }
+
+                try (FileWriter writer = new FileWriter(file)) {
+                    for (String line : this.getData()) {
+                        writer.write(line + System.lineSeparator());
+                    }
+                } catch (IOException e) {
+                    System.out.println("Ошибка при работе с файлом: " + e.getMessage());
+                    System.out.println();
+                }
+
+            } else {
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(file.toString(), true))) {
+                    for (String line : this.getData()) {
+                        writer.write(line);
+                        writer.newLine();
+                    }
+                } catch (IOException e) {
+                    System.err.println("Ошибка при записи в файл: " + e.getMessage());
+                }
             }
         }
     }
