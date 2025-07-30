@@ -78,9 +78,11 @@ public class InputCommand {
         this.parseInputArgs(args);
         this.checkParameters();
 
-        if (this.errorMessages.length > 0) {
-            for (int i = 0; i < this.errorMessages.length; i += 1) {
-                System.out.println(this.errorMessages[i]);
+        errorMessages = this.getErrorMessages();
+
+        if (getIsHasErrors()) {
+            for (int i = 0; i < errorMessages.length; i += 1) {
+                System.out.println(errorMessages[i]);
             }
 
             System.exit(1);
@@ -156,7 +158,7 @@ public class InputCommand {
             return;
         }
 
-        this.isHasErrors = true;
+        this.setIsHasErrors(true);
         this.addMessageErrorMessageList("Разрешено одновременное использование только одного из флагов:");
         this.addMessageErrorMessageList("-s: для получения краткой статистики;");
         this.addMessageErrorMessageList("-f: для получения полной статистики.");
@@ -168,14 +170,16 @@ public class InputCommand {
      * Проверить на корректность указанный путь для создания результирующих файлов
      */
     private void checkOutPath() {
-        Pattern outPathPattern = Pattern.compile(this.outPathRegex);
-        Matcher outPathmatcher = outPathPattern.matcher(this.outPrefix);
+        outPath = this.getOutPath();
 
-        if ((this.outPath == null) || outPathmatcher.matches()) {
+        Pattern outPathPattern = Pattern.compile(this.outPathRegex);
+        Matcher outPathMatcher = outPathPattern.matcher(outPath);
+
+        if ((outPath == null) || outPathMatcher.matches()) {
             return;
         }
 
-        this.isHasErrors = true;
+        this.setIsHasErrors(true);
         this.addMessageErrorMessageList("Ошибка в пути для создания результирующих файлов (после флага -o).");
         this.addMessageErrorMessageList("Возможные причины:");
         this.addMessageErrorMessageList("Запрещенные символы: <, >, :, \", \\, |, ?, *;");
@@ -189,14 +193,16 @@ public class InputCommand {
      * Проверить на корректность указанный префикс для результирующих файлов
      */
     private void checkOutPrefix() {
-        Pattern outPrefixPattern = Pattern.compile(this.outPrefixRegex);
-        Matcher outPrefixMatcher = outPrefixPattern.matcher(this.outPrefix);
+        outPrefix = this.getOutPrefix();
 
-        if ((this.outPrefix == null) || outPrefixMatcher.matches()) {
+        Pattern outPrefixPattern = Pattern.compile(this.outPrefixRegex);
+        Matcher outPrefixMatcher = outPrefixPattern.matcher(outPrefix);
+
+        if ((outPrefix == null) || outPrefixMatcher.matches()) {
             return;
         }
 
-        this.isHasErrors = true;
+        this.setIsHasErrors(true);
         this.addMessageErrorMessageList("Ошибка в префиксе для создания результирующих файлов (после флага -p).");
         this.addMessageErrorMessageList("Возможные причины:");
         this.addMessageErrorMessageList("Запрещенные символы: <, >, :, \", /, \\, |, ?, *;");
@@ -208,11 +214,11 @@ public class InputCommand {
      * Проверить на наличие название вводных текстовых файлов
      */
     private void checkInputFileExists() {
-        if (this.listFilesPosition.length != 0) {
+        if (this.getListFilesPosition().length != 0) {
             return;
         }
 
-        this.isHasErrors = true;
+        this.setIsHasErrors(true);
         this.addMessageErrorMessageList("Укажите названия текстовых файлов, которые нужно обработать.");
         this.addMessageErrorMessageList("");
 
@@ -222,14 +228,17 @@ public class InputCommand {
      * Проверить, на каких позициях находятся имена входных файлов в командной строке
      */
     private void checkFileNamePosition() {
-        for (int i = 0; i < this.listFilesPosition.length; i += 2) {
 
-            if (Integer.parseInt(this.listFilesPosition[i]) > this.getLastFlagIndex()) {
+        listFilesPosition = this.getListFilesPosition();
+
+        for (int i = 0; i < listFilesPosition.length; i += 2) {
+
+            if (Integer.parseInt(listFilesPosition[i]) > this.getLastFlagIndex()) {
                 continue;
             }
 
-            this.isHasErrors = true;
-            this.addMessageErrorMessageList("Указанное название файла: " + this.listFilesPosition[i + 1] + " должно находиться после использования флагов и их аргументов.");
+            this.setIsHasErrors(true);
+            this.addMessageErrorMessageList("Указанное название файла: " + listFilesPosition[i + 1] + " должно находиться после использования флагов и их аргументов.");
             this.addMessageErrorMessageList("");
 
         }
@@ -239,17 +248,19 @@ public class InputCommand {
      * Проверить тип входных файлов
      */
     private void checkFileTypes() {
+        listFilesPosition = this.getListFilesPosition();
+
         Pattern txtFilePattern = Pattern.compile(this.txtFilePattern);
 
-        for (int i = 1; i < this.listFilesPosition.length; i += 2) {
-            Matcher txtFileMatcher = txtFilePattern.matcher(this.listFilesPosition[i]);
+        for (int i = 1; i < listFilesPosition.length; i += 2) {
+            Matcher txtFileMatcher = txtFilePattern.matcher(listFilesPosition[i]);
 
             if (txtFileMatcher.matches()) {
                 continue;
             }
 
-            this.isHasErrors = true;
-            this.addMessageErrorMessageList("Указанный файл: " + this.listFilesPosition[i] + " не является текстовым документом.");
+            this.setIsHasErrors(true);
+            this.addMessageErrorMessageList("Указанный файл: " + listFilesPosition[i] + " не является текстовым документом.");
             this.addMessageErrorMessageList("");
 
         }
@@ -259,24 +270,24 @@ public class InputCommand {
      * Проверить есть ли дублирующиеся названия в файлах
      */
     private void checkDuplicateFiles() {
+        listFilesPosition = this.getListFilesPosition();
+
         Pattern txtFilePattern = Pattern.compile(this.txtFilePattern);
 
-        for (int i = 1; i < this.listFilesPosition.length; i += 2) {
-            Matcher txtFileMatcher = txtFilePattern.matcher(this.listFilesPosition[i]);
+        for (int i = 1; i < listFilesPosition.length; i += 2) {
+            Matcher txtFileMatcher = txtFilePattern.matcher(listFilesPosition[i]);
 
             if (txtFileMatcher.matches()) {
                 continue;
             }
 
-            this.isHasErrors = true;
-            this.addMessageErrorMessageList("Указанный файл: " + this.listFilesPosition[i] + " не является текстовым документом.");
+            this.setIsHasErrors(true);
+            this.addMessageErrorMessageList("Указанный файл: " + listFilesPosition[i] + " не является текстовым документом.");
             this.addMessageErrorMessageList("");
-
         }
     }
 
-
-    public boolean isOutRewrite() {
+    public boolean getIsOutRewrite() {
         return this.isOutRewrite;
     }
 
@@ -284,7 +295,7 @@ public class InputCommand {
         this.isOutRewrite = outRewrite;
     }
 
-    public boolean isBriefStat() {
+    public boolean getIsBriefStat() {
         return this.isBriefStat;
     }
 
@@ -292,7 +303,7 @@ public class InputCommand {
         this.isBriefStat = isBriefStat;
     }
 
-    public boolean isFullStat() {
+    public boolean getIsFullStat() {
         return this.isFullStat;
     }
 
@@ -300,7 +311,7 @@ public class InputCommand {
         this.isFullStat = isFullStat;
     }
 
-    public String outPrefix() {
+    public String getOutPrefix() {
         return this.outPrefix;
     }
 
@@ -308,7 +319,7 @@ public class InputCommand {
         this.outPrefix = outPrefix;
     }
 
-    public String outPath() {
+    public String getOutPath() {
         return this.outPath;
     }
 
@@ -316,7 +327,7 @@ public class InputCommand {
         this.outPath = outPath;
     }
 
-    public String[] listFilesPosition() {
+    public String[] getListFilesPosition() {
         return this.listFilesPosition;
     }
 
@@ -342,7 +353,7 @@ public class InputCommand {
         this.lastFlagIndex = lastFlagIndex;
     }
 
-    public String[] errorMessages() {
+    public String[] getErrorMessages() {
         return this.errorMessages;
     }
 
@@ -357,11 +368,11 @@ public class InputCommand {
         this.errorMessages = newErrorMessageList;
     }
 
-    public boolean isHasErrors() {
+    public boolean getIsHasErrors() {
         return this.isHasErrors;
     }
 
-    public void setHasErrors(boolean isHasErrors) {
+    public void setIsHasErrors(boolean isHasErrors) {
         this.isHasErrors = isHasErrors;
     }
 }
