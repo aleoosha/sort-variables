@@ -158,7 +158,7 @@ public class InputCommand {
      * Проверить на корректность указанный путь для создания результирующих файлов
      */
     private void checkOutPath() {
-        outPath = this.getOutPath();
+        String outPath = this.getOutPath();
 
         if (outPath == null) {
             return;
@@ -185,7 +185,7 @@ public class InputCommand {
      * Проверить на корректность указанный префикс для результирующих файлов
      */
     private void checkOutPrefix() {
-        outPrefix = this.getOutPrefix();
+        String outPrefix = this.getOutPrefix();
 
         if (outPrefix == null) {
             return;
@@ -225,7 +225,7 @@ public class InputCommand {
      */
     private void checkFileNamePosition() {
 
-        listFilesPosition = this.getListFilesPosition();
+        String[] listFilesPosition = this.getListFilesPosition();
 
         for (int i = 0; i < listFilesPosition.length; i += 2) {
 
@@ -244,7 +244,7 @@ public class InputCommand {
      * Проверить тип входных файлов
      */
     private void checkFileTypes() {
-        listFilesPosition = this.getListFilesPosition();
+        String[] listFilesPosition = this.getListFilesPosition();
 
         Pattern txtFilePattern = Pattern.compile(this.txtFilePattern);
 
@@ -266,7 +266,7 @@ public class InputCommand {
      * Проверить есть ли дублирующиеся названия в файлах
      */
     private void checkDuplicateFiles() {
-        listFilesPosition = this.getListFilesPosition();
+        String[] listFilesPosition = this.getListFilesPosition();
 
         if (!ArrayHelper.hasDuplicates(listFilesPosition)) { return; }
 
