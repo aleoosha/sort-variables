@@ -107,6 +107,19 @@ public class OutputFile {
             return;
         }
 
+        StringBuilder directoryPath = this.createResultDirectory();
+
+        if (!this.getAddedPath().isEmpty()) {
+            directoryPath = this.createAddedDirectories(directoryPath);
+        }
+
+        this.createResultFile(directoryPath, isRewrite);
+    }
+
+    /**
+     * Создание директории для результатов, если она отсутствует
+     */
+    private StringBuilder createResultDirectory() {
         StringBuilder directoryPath = new StringBuilder(this.getPath());
         File directory = new File(directoryPath.toString());
 
@@ -118,24 +131,38 @@ public class OutputFile {
             }
         }
 
-        if (!this.getAddedPath().isEmpty()) {
-            String[] addedDirectoriesList = this.getAddedPath().split("/");
+        return directoryPath;
+    }
 
-            for (int i = 1; i < addedDirectoriesList.length; i++) {
-                directoryPath.append("/").append(addedDirectoriesList[i]);
+    /**
+     * Создание дополнительной директории по надобности
+     */
+    private StringBuilder createAddedDirectories(StringBuilder directoryPath) {
+        String[] addedDirectoriesList = this.getAddedPath().split("/");
 
-                File addedDirectory = new File(String.valueOf(directoryPath));
+        for (int i = 1; i < addedDirectoriesList.length; i++) {
+            directoryPath.append("/").append(addedDirectoriesList[i]);
 
-                if (!addedDirectory.exists()) {
-                    if (!addedDirectory.mkdir()) {
-                        System.out.println("Не удалось создать директорию: " + directoryPath);
-                        System.out.println();
-                        System.exit(1);
-                    }
+            File addedDirectory = new File(String.valueOf(directoryPath));
+
+            if (!addedDirectory.exists()) {
+                if (!addedDirectory.mkdir()) {
+                    System.out.println("Не удалось создать директорию: " + directoryPath);
+                    System.out.println();
+                    System.exit(1);
                 }
             }
         }
 
+        return directoryPath;
+    }
+
+    /**
+     * Создание файла с результатом
+     *
+     * @param isRewrite Нужно ли перезаписывать файл?
+     */
+    private void createResultFile(StringBuilder directoryPath, boolean isRewrite) {
         File resultDirectory = new File(String.valueOf(directoryPath));
 
         if (resultDirectory.exists()) {
@@ -148,8 +175,9 @@ public class OutputFile {
                     for (String line : this.getData()) {
                         writer.write(line + System.lineSeparator());
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException error) {
+                    System.out.println("Ошибка при работе с файлом: " + error.getMessage());
+                    System.out.println();
                 }
 
             } else if (isRewrite) {
@@ -164,8 +192,8 @@ public class OutputFile {
                     for (String line : this.getData()) {
                         writer.write(line + System.lineSeparator());
                     }
-                } catch (IOException e) {
-                    System.out.println("Ошибка при работе с файлом: " + e.getMessage());
+                } catch (IOException error) {
+                    System.out.println("Ошибка при работе с файлом: " + error.getMessage());
                     System.out.println();
                 }
 
@@ -175,11 +203,12 @@ public class OutputFile {
                         writer.write(line);
                         writer.newLine();
                     }
-                } catch (IOException e) {
-                    System.err.println("Ошибка при записи в файл: " + e.getMessage());
+                } catch (IOException error) {
+                    System.err.println("Ошибка при записи в файл: " + error.getMessage());
                 }
             }
         }
+
     }
 
     private void setName(String name) {
