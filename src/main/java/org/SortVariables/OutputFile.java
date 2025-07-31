@@ -57,11 +57,6 @@ public class OutputFile {
     private boolean isCreated = false;
 
     /**
-     * Был ли результирующий файл создан ранее?
-     */
-    private boolean isFileExistBefore = false;
-
-    /**
      * Путь до созданного файла
      */
     private String resultFilePath;
@@ -104,8 +99,6 @@ public class OutputFile {
         this.setAddedPath(inputCommand.getOutPath());
 
         this.setResultFilePath(this.getPath() + this.getAddedPath() + "/" + name);
-
-        this.setIsFileExistBefore();
 
         for (InputFile inputFile : inputFileList) {
             String[] inputFileVariablesWithTypeList = inputFile.getVariablesWithTypeList();
@@ -295,15 +288,5 @@ public class OutputFile {
 
     private void setResultFilePath(String resultFilePath) {
         this.resultFilePath = resultFilePath;
-    }
-
-    private void setIsFileExistBefore() {
-        File file = new File(this.getPath() + this.getAddedPath(), this.getName());
-
-        this.isFileExistBefore = file.exists();
-    }
-
-    public boolean getIsFileExistBefore() {
-        return this.isFileExistBefore;
     }
 }
