@@ -608,11 +608,8 @@ public class FileStatistic {
                 String line;
 
                 while ((line = reader.readLine()) != null) {
-                    if (!line.trim().isEmpty()) {
-                        String[] newFileData = Arrays.copyOf(this.fileData, this.fileData.length + 1);
-                        newFileData[newFileData.length - 1] = line;
-                        this.fileData = newFileData;
-                    }
+                    if (line.trim().isEmpty()) { continue; }
+                    this.addElementToFileData(line);
                 }
 
                 this.isFileDataSet = true;
@@ -626,5 +623,22 @@ public class FileStatistic {
         } else {
             return this.fileData;
         }
+    }
+
+    /**
+     * Добавить элемент в массив с данными из результирующего файла
+     *
+     * @param element Значение из строки результирующего файла
+     */
+    private void addElementToFileData(String element) {
+        if (this.fileData.length == Integer.MAX_VALUE) {
+            System.err.println("Слишком большое количество строк в выходном файле: " + this.getFilePath());
+            System.out.println();
+            System.exit(1);
+        }
+
+        String[] newFileData = Arrays.copyOf(this.fileData, this.fileData.length + 1);
+        newFileData[newFileData.length - 1] = element;
+        this.fileData = newFileData;
     }
 }
