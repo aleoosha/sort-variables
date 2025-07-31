@@ -57,6 +57,11 @@ public class OutputFile {
     private boolean isCreated = false;
 
     /**
+     * Путь до созданного файла
+     */
+    private String resultFilePath;
+
+    /**
      * Данные для записи в файл
      */
     private String[] data = {};
@@ -191,8 +196,6 @@ public class OutputFile {
                     System.out.println();
                 }
 
-                this.setIsCreated(true);
-
             } else if (isRewrite) {
 
                 if (!file.delete()) {
@@ -210,9 +213,8 @@ public class OutputFile {
                     System.out.println();
                 }
 
-                this.setIsCreated(true);
-
             } else {
+
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(file.toString(), true))) {
                     for (String line : this.getData()) {
                         writer.write(line);
@@ -222,10 +224,11 @@ public class OutputFile {
                     System.err.println("Ошибка при записи в файл: " + error.getMessage());
                 }
 
-                this.setIsCreated(true);
             }
-        }
 
+            this.setIsCreated(true);
+            this.setResultFilePath(file.toString());
+        }
     }
 
     private void setName(String name) {
@@ -270,11 +273,19 @@ public class OutputFile {
         return this.data;
     }
 
-    public boolean isCreated() {
-        return isCreated;
+    public boolean getIsCreated() {
+        return this.isCreated;
     }
 
     public void setIsCreated(boolean isCreated) {
-        isCreated = isCreated;
+        this.isCreated = isCreated;
+    }
+
+    public String getResultFilePath() {
+        return this.resultFilePath;
+    }
+
+    public void setResultFilePath(String resultFilePath) {
+        this.resultFilePath = resultFilePath;
     }
 }
