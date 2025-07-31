@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * Класс для работы с данными и создания/редактирования результирующего файла
+ */
 public class OutputFile {
 
     /**
@@ -23,6 +26,9 @@ public class OutputFile {
      */
     final String STRING_FILE_NAME = "strings.txt";
 
+    /**
+     * Директория для сохранения результирующего файла по умолчанию
+     */
     final String OUTPUT_FILE_FOLDER = "/result-files";
 
     /**
