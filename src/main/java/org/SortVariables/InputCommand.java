@@ -15,6 +15,11 @@ public class InputCommand {
     private String[] listFilesPosition = {};
 
     /**
+     * Необработанные флаги из командной строки
+     */
+    private String[] undefinedFlagList = {};
+
+    /**
      * Список сообщений с ошибками
      */
     private String[] errorMessages = {};
@@ -58,6 +63,11 @@ public class InputCommand {
      * Регулярное выражение для проверки пути до результирующих файлов
      */
     final String OUT_PATH_REGEX = "^\\/(?:[^<>:\"\\/\\\\|?*\\x00-\\x1F]{1,100}\\/?)+$";
+
+    /**
+     * Регулярное выражение для проверки на флаг из командной строки
+     */
+    final String FLAG_REGEX = "--?\\w+";
 
     /**
      * Позиция последнего флага из командной строки
@@ -120,7 +130,7 @@ public class InputCommand {
                     this.setOutPrefix(args[i + 1]);
                     break;
                 default:
-                    this.addFileToFilePositionList(String.valueOf(i), element);
+                    this.filterOtherArguments(String.valueOf(i), element);
             }
         }
     }
@@ -130,12 +140,35 @@ public class InputCommand {
      */
     private void checkParameters() {
         this.checkSimultaneousStatisticUse();
+        this.checkNoStatisticUse();
         this.checkOutPath();
         this.checkOutPrefix();
         this.checkInputFileExists();
         this.checkFileNamePosition();
         this.checkFileTypes();
         this.checkDuplicateFiles();
+        this.checkUndefinedFlags();
+    }
+
+    /**
+     * Проверить использовались ли необрабатываемые флаги
+     */
+    private void checkUndefinedFlags() {
+        if (this.undefinedFlagList.length == 0) {
+            return;
+        }
+
+        this.setIsHasErrors(true);
+        for (String flag : this.undefinedFlagList) {
+            this.addMessageErrorMessageList("Обнаружен неизвестный флаг: " + flag);
+        }
+        this.addMessageErrorMessageList("Разрешено использование следующих флагов:");
+        this.addMessageErrorMessageList("-p: Задать префикс выходному файлу;");
+        this.addMessageErrorMessageList("-o: Задать путь выходному файлу относительно результирующей директории;");
+        this.addMessageErrorMessageList("-s: Выбор краткой статистики;");
+        this.addMessageErrorMessageList("-f: Выбор полной статистики;");
+        this.addMessageErrorMessageList("-a: Режим добавления данных в существующие файлы.");
+        this.addMessageErrorMessageList("");
     }
 
     /**
@@ -148,6 +181,23 @@ public class InputCommand {
 
         this.setIsHasErrors(true);
         this.addMessageErrorMessageList("Разрешено одновременное использование только одного из флагов:");
+        this.addMessageErrorMessageList("-s: для получения краткой статистики;");
+        this.addMessageErrorMessageList("-f: для получения полной статистики.");
+        this.addMessageErrorMessageList("");
+
+    }
+
+    /**
+     * Проверить на отсутствие использования флагов статистики
+     */
+    private void checkNoStatisticUse() {
+        if (this.isBriefStat || this.isFullStat) {
+            return;
+        }
+
+        this.setIsHasErrors(true);
+        this.addMessageErrorMessageList("Пропущен выбор статистики.");
+        this.addMessageErrorMessageList("Выберите какую статистику хотите получить:");
         this.addMessageErrorMessageList("-s: для получения краткой статистики;");
         this.addMessageErrorMessageList("-f: для получения полной статистики.");
         this.addMessageErrorMessageList("");
@@ -321,24 +371,53 @@ public class InputCommand {
     }
 
     /**
+     * Разделить оставшиеся аргументы на необработанные флаги и потенциальные названия файлов
+     *
+     * @param key Позиция среди аргументов командной строки
+     * @param argument Значение аргумента
+     */
+    private void filterOtherArguments(String key, String argument) {
+        Pattern flagPattern = Pattern.compile(this.FLAG_REGEX);
+        Matcher flagMatcher = flagPattern.matcher(argument);
+
+        if (flagMatcher.matches()) {
+            this.addFlagToUndefinedFlagList(argument);
+            return;
+        }
+
+        this.addFileToFilePositionList(key, argument);
+    }
+
+    /**
      * Формирование списка с позициями и наименованиями файлов
      *
      * @param key      Позиция элемента в массиве аргументов командной строки
      * @param fileName Наименование файла
      * @example [4, in1.txt, 5, in2.txt]
      */
-    public void addFileToFilePositionList(String key, String fileName) {
+    private void addFileToFilePositionList(String key, String fileName) {
         String[] newListFilesPosition = Arrays.copyOf(this.listFilesPosition, this.listFilesPosition.length + 2);
         newListFilesPosition[newListFilesPosition.length - 2] = key;
         newListFilesPosition[newListFilesPosition.length - 1] = fileName;
         this.listFilesPosition = newListFilesPosition;
     }
 
+    /**
+     * Добавление флага в список не обработанных флагов
+     *
+     * @param flag Флаг из командной строки
+     */
+    private void addFlagToUndefinedFlagList(String flag) {
+        String[] newListFilesPosition = Arrays.copyOf(this.undefinedFlagList, this.undefinedFlagList.length + 1);
+        newListFilesPosition[newListFilesPosition.length - 1] = flag;
+        this.undefinedFlagList = newListFilesPosition;
+    }
+
     public int getLastFlagIndex() {
         return this.lastFlagIndex;
     }
 
-    public void setLastFlagIndex(int lastFlagIndex) {
+    private void setLastFlagIndex(int lastFlagIndex) {
         this.lastFlagIndex = lastFlagIndex;
     }
 
