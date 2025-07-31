@@ -53,6 +53,10 @@ public class InputFile {
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
 
+            if (line.isEmpty()) {
+                continue;
+            }
+
             boolean isInteger;
             boolean isFloat;
             String type;
@@ -60,7 +64,7 @@ public class InputFile {
             try {
                 new BigInteger(line);
                 isInteger = true;
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException error) {
                 isInteger = false;
             }
 
@@ -68,7 +72,7 @@ public class InputFile {
                 try {
                     Double.parseDouble(line);
                     isFloat = true;
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException error) {
                     isFloat = false;
                 }
             } else {

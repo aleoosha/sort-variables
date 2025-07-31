@@ -17,15 +17,26 @@ public class Main {
             InputFile[] inputFilesList = getInputFilesList(inputCommand);
 
             OutputFile intOutputFile = new OutputFile("int", inputCommand, inputFilesList);
-            OutputFile stringOutputFile = new OutputFile("string", inputCommand, inputFilesList);
             OutputFile floatOutputFile = new OutputFile("float", inputCommand, inputFilesList);
+            OutputFile stringOutputFile = new OutputFile("string", inputCommand, inputFilesList);
 
             intOutputFile.create(inputCommand.getIsOutRewrite());
-            stringOutputFile.create(inputCommand.getIsOutRewrite());
             floatOutputFile.create(inputCommand.getIsOutRewrite());
+            stringOutputFile.create(inputCommand.getIsOutRewrite());
+
+            if (inputCommand.getIsBriefStat()) {
+                new FileStatistic("brief", intOutputFile.getResultFilePath(), "int").calculate().print();
+                new FileStatistic("brief", floatOutputFile.getResultFilePath(), "float").calculate().print();
+                new FileStatistic("brief", stringOutputFile.getResultFilePath(), "string").calculate().print();
+            } else if (inputCommand.getIsFullStat()) {
+                new FileStatistic("full", intOutputFile.getResultFilePath(), "int").calculate().print();
+                new FileStatistic("full", floatOutputFile.getResultFilePath(), "float").calculate().print();
+                new FileStatistic("full", stringOutputFile.getResultFilePath(), "string").calculate().print();
+            }
 
         } catch (OutOfMemoryError error) {
             System.err.println("Ошибка нехватки памяти: " + error.getMessage());
+            System.out.println();
             System.exit(1);
         }
     }
@@ -37,7 +48,7 @@ public class Main {
      */
     private static void sendErrorMessages(String[] errorMessages) {
         for (String errorMessage : errorMessages) {
-            System.out.println(errorMessage);
+            System.err.println(errorMessage);
         }
     }
 

@@ -57,6 +57,11 @@ public class OutputFile {
     private boolean isCreated = false;
 
     /**
+     * Был ли результирующий файл создан ранее?
+     */
+    private boolean isFileExistBefore = false;
+
+    /**
      * Путь до созданного файла
      */
     private String resultFilePath;
@@ -97,6 +102,10 @@ public class OutputFile {
         this.setPath(currentDirectory + this.OUTPUT_FILE_FOLDER);
 
         this.setAddedPath(inputCommand.getOutPath());
+
+        this.setResultFilePath(this.getPath() + this.getAddedPath() + "/" + name);
+
+        this.setIsFileExistBefore();
 
         for (InputFile inputFile : inputFileList) {
             String[] inputFileVariablesWithTypeList = inputFile.getVariablesWithTypeList();
@@ -163,7 +172,7 @@ public class OutputFile {
 
             if (!addedDirectory.exists()) {
                 if (!addedDirectory.mkdir()) {
-                    System.out.println("Не удалось создать директорию: " + directoryPath);
+                    System.err.println("Не удалось создать директорию: " + directoryPath);
                     System.out.println();
                     System.exit(1);
                 }
@@ -192,14 +201,14 @@ public class OutputFile {
                         writer.write(line + System.lineSeparator());
                     }
                 } catch (IOException error) {
-                    System.out.println("Ошибка при работе с файлом: " + error.getMessage());
+                    System.err.println("Ошибка при работе с файлом: " + error.getMessage());
                     System.out.println();
                 }
 
             } else if (isRewrite) {
 
                 if (!file.delete()) {
-                    System.out.println("Не удалось удалить file: " + file.toString());
+                    System.err.println("Не удалось удалить file: " + file.toString());
                     System.out.println();
                     System.exit(1);
                 }
@@ -209,7 +218,7 @@ public class OutputFile {
                         writer.write(line + System.lineSeparator());
                     }
                 } catch (IOException error) {
-                    System.out.println("Ошибка при работе с файлом: " + error.getMessage());
+                    System.err.println("Ошибка при работе с файлом: " + error.getMessage());
                     System.out.println();
                 }
 
@@ -227,7 +236,6 @@ public class OutputFile {
             }
 
             this.setIsCreated(true);
-            this.setResultFilePath(file.toString());
         }
     }
 
@@ -277,7 +285,7 @@ public class OutputFile {
         return this.isCreated;
     }
 
-    public void setIsCreated(boolean isCreated) {
+    private void setIsCreated(boolean isCreated) {
         this.isCreated = isCreated;
     }
 
@@ -285,7 +293,17 @@ public class OutputFile {
         return this.resultFilePath;
     }
 
-    public void setResultFilePath(String resultFilePath) {
+    private void setResultFilePath(String resultFilePath) {
         this.resultFilePath = resultFilePath;
+    }
+
+    private void setIsFileExistBefore() {
+        File file = new File(this.getPath() + this.getAddedPath(), this.getName());
+
+        this.isFileExistBefore = file.exists();
+    }
+
+    public boolean getIsFileExistBefore() {
+        return this.isFileExistBefore;
     }
 }
