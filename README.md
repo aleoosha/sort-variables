@@ -4,9 +4,9 @@
 - [Версионирование](#Версионирование)
 - [Установка](#Установка)
     - [Java](#Java)
-    - [Apache Maven](#Apache Maven)
+    - [Maven](#Maven)
     - [Проект](#Проект)
-- [Работа с файлами](#Работа с файлами)
+- [Использование](#Использование)
 
 ### Версионирование
 
@@ -18,7 +18,7 @@
 
 #### Java
  Подробнее об установке Java Development Kit можно узнать [здесь](https://help.reg.ru/support/servery-vps/oblachnyye-servery/ustanovka-programmnogo-obespecheniya/kak-ustanovit-java-na-ubuntu#1)
-#### Apache Maven
+#### Maven
  Подробнее об установке Apache Maven можно узнать [здесь](https://losst.pro/ustanovka-maven-v-ubuntu-20-04)
 #### Проект
  
@@ -74,7 +74,7 @@ OS name: "linux", version: "6.14.0-27-generic", arch: "amd64", family: "unix"
 [INFO] ------------------------------------------------------------------------
 ```
 
-### Работа с файлами
+### Использование
 
 - Создайте и заполните данными необходимое количество входных текстовых файлов в папке [input-files](/input-files), по умолчанию в проекте есть 2 примера тестовых файлов in1.txt и in2.txt 
 
