@@ -25,18 +25,18 @@ public class Main {
             OutputFile floatOutputFile = new OutputFile("float", inputCommand, inputFilesList);
             OutputFile stringOutputFile = new OutputFile("string", inputCommand, inputFilesList);
 
-            intOutputFile.create(inputCommand.getIsOutRewrite());
-            floatOutputFile.create(inputCommand.getIsOutRewrite());
-            stringOutputFile.create(inputCommand.getIsOutRewrite());
+            intOutputFile.refreshFile(inputCommand.getIsOutRewrite());
+            floatOutputFile.refreshFile(inputCommand.getIsOutRewrite());
+            stringOutputFile.refreshFile(inputCommand.getIsOutRewrite());
 
             if (inputCommand.getIsBriefStat()) {
-                new FileStatistic("brief", intOutputFile.getResultFilePath(), "int").calculate().print();
-                new FileStatistic("brief", floatOutputFile.getResultFilePath(), "float").calculate().print();
-                new FileStatistic("brief", stringOutputFile.getResultFilePath(), "string").calculate().print();
+                new FileStatistic("brief", intOutputFile, "int").calculate().print();
+                new FileStatistic("brief", floatOutputFile, "float").calculate().print();
+                new FileStatistic("brief", stringOutputFile, "string").calculate().print();
             } else if (inputCommand.getIsFullStat()) {
-                new FileStatistic("full", intOutputFile.getResultFilePath(), "int").calculate().print();
-                new FileStatistic("full", floatOutputFile.getResultFilePath(), "float").calculate().print();
-                new FileStatistic("full", stringOutputFile.getResultFilePath(), "string").calculate().print();
+                new FileStatistic("full", intOutputFile, "int").calculate().print();
+                new FileStatistic("full", floatOutputFile, "float").calculate().print();
+                new FileStatistic("full", stringOutputFile, "string").calculate().print();
             }
 
         } catch (OutOfMemoryError error) {

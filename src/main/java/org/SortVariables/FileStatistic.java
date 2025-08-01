@@ -1,6 +1,7 @@
 package org.SortVariables;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -99,19 +100,29 @@ public class FileStatistic {
     private boolean isFileDataSet;
 
     /**
+     * Был ли результирующий файл создан ранее?
+     */
+    private boolean isFileExist = false;
+
+    /**
      * Инициализация данных для подсчета статистики
      *
      * @param type     Тип статистики
-     * @param filePath Путь до результирующего файла
+     * @param outputFile Объект с данными о выходном файле
      * @param fileType Тип результирующего файла
      */
-    public FileStatistic(String type, String filePath, String fileType) {
-        this.setFilePath(filePath);
+    public FileStatistic(String type, OutputFile outputFile, String fileType) {
+        this.setFilePath(outputFile.getResultFilePath());
+        this.setIsFileExist(outputFile.getIsCreated() || (outputFile.getIsFileExistBefore() && !outputFile.getIsDeleted()));
         this.setFileType(fileType);
         this.setType(type);
     }
 
     public FileStatistic calculate() {
+        if (!this.getIsFileExist()) {
+            return this;
+        }
+
         this.setElementsCount(this.countElements());
 
         if (this.type.equals("brief")) {
@@ -310,7 +321,7 @@ public class FileStatistic {
                     sum = sum.add(number);
                 }
             } catch (NumberFormatException error) {
-                System.err.println("Ошибка преобразования строки в число: " + line);
+                System.err.println("Ошибка преобразования строки в число с плавающей точкой: " + line);
                 System.err.println("В файле: " + this.filePath);
                 System.out.println();
                 System.exit(1);
@@ -640,5 +651,13 @@ public class FileStatistic {
         String[] newFileData = Arrays.copyOf(this.fileData, this.fileData.length + 1);
         newFileData[newFileData.length - 1] = element;
         this.fileData = newFileData;
+    }
+
+    private void setIsFileExist(boolean isFileExist) {
+        this.isFileExist = isFileExist;
+    }
+
+    public boolean getIsFileExist() {
+        return this.isFileExist;
     }
 }

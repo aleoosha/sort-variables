@@ -27,6 +27,16 @@ public class OutputFile {
     final String STRING_FILE_NAME = "strings.txt";
 
     /**
+     * Был ли файл удален;
+     */
+    private boolean isDeleted = false;
+
+    /**
+     * Был ли результирующий файл создан ранее?
+     */
+    private boolean isFileExistBefore = false;
+
+    /**
      * Директория для сохранения результирующего файла по умолчанию
      */
     final String OUTPUT_FILE_FOLDER = "";
@@ -100,6 +110,8 @@ public class OutputFile {
 
         this.setResultFilePath(this.getPath() + this.getAddedPath() + "/" + name);
 
+        this.setIsFileExistBefore();
+
         for (InputFile inputFile : inputFileList) {
             String[] inputFileVariablesWithTypeList = inputFile.getVariablesWithTypeList();
 
@@ -110,17 +122,21 @@ public class OutputFile {
             }
         }
 
-        if (this.getData() == null) {
+        if (this.getData().length == 0) {
             this.setIsEmpty(true);
         }
     }
 
     /**
-     * Создание выходного файла
+     * Дополнение, пересоздание или удаление старого файла
      *
      * @param isRewrite нужно ли перезаписывать файл
      */
-    public void create(boolean isRewrite) {
+    public void refreshFile(boolean isRewrite) {
+        if (isRewrite && this.getIsFileExistBefore() && this.getIsEmpty()) {
+            this.deleteOldFile();
+        }
+
         if (this.getIsEmpty()) {
             return;
         }
@@ -184,52 +200,65 @@ public class OutputFile {
         File resultDirectory = new File(String.valueOf(directoryPath));
 
         if (resultDirectory.exists()) {
-
             File file = new File(resultDirectory, this.getName());
 
             if (!file.exists()) {
-
-                try (FileWriter writer = new FileWriter(file)) {
-                    for (String line : this.getData()) {
-                        writer.write(line + System.lineSeparator());
-                    }
-                } catch (IOException error) {
-                    System.err.println("Ошибка при работе с файлом: " + error.getMessage());
-                    System.out.println();
-                }
-
+                this.createNewFile();
             } else if (isRewrite) {
-
-                if (!file.delete()) {
-                    System.err.println("Не удалось удалить file: " + file.toString());
-                    System.out.println();
-                    System.exit(1);
-                }
-
-                try (FileWriter writer = new FileWriter(file)) {
-                    for (String line : this.getData()) {
-                        writer.write(line + System.lineSeparator());
-                    }
-                } catch (IOException error) {
-                    System.err.println("Ошибка при работе с файлом: " + error.getMessage());
-                    System.out.println();
-                }
-
+                this.deleteOldFile();
+                this.createNewFile();
             } else {
-
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(file.toString(), true))) {
-                    for (String line : this.getData()) {
-                        writer.write(line);
-                        writer.newLine();
-                    }
-                } catch (IOException error) {
-                    System.err.println("Ошибка при записи в файл: " + error.getMessage());
-                }
-
+                this.appendOldFile();
             }
 
             this.setIsCreated(true);
         }
+    }
+
+    /**
+     * Дописать данные в старый файл
+     */
+    private void appendOldFile() {
+        File file = new File(this.getResultFilePath());
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file.toString(), true))) {
+            for (String line : this.getData()) {
+                writer.write(line);
+                writer.newLine();
+            }
+        } catch (IOException error) {
+            System.err.println("Ошибка при записи в файл: " + error.getMessage());
+        }
+    }
+
+    /**
+     * Удалить старый файл, который совпадает с текущим результирующим файлом
+     */
+    private void deleteOldFile() {
+        File file = new File(this.getResultFilePath());
+
+        if (!file.delete()) {
+            System.err.println("Не удалось удалить file: " + file.toString());
+            System.out.println();
+            System.exit(1);
+        }
+
+        this.setIsDeleted(true);
+    }
+
+    private void createNewFile() {
+        File file = new File(this.getResultFilePath());
+
+        try (FileWriter writer = new FileWriter(file)) {
+            for (String line : this.getData()) {
+                writer.write(line + System.lineSeparator());
+            }
+        } catch (IOException error) {
+            System.err.println("Ошибка при работе с файлом: " + error.getMessage());
+            System.out.println();
+        }
+
+        this.setIsDeleted(false);
     }
 
     private void setName(String name) {
@@ -288,5 +317,23 @@ public class OutputFile {
 
     private void setResultFilePath(String resultFilePath) {
         this.resultFilePath = resultFilePath;
+    }
+
+    private void setIsFileExistBefore() {
+        File file = new File(this.getPath() + this.getAddedPath(), this.getName());
+
+        this.isFileExistBefore = file.exists();
+    }
+
+    public boolean getIsFileExistBefore() {
+        return this.isFileExistBefore;
+    }
+
+    private void setIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public boolean getIsDeleted() {
+        return this.isDeleted;
     }
 }
