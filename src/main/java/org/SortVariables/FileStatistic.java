@@ -289,7 +289,7 @@ public class FileStatistic {
         BigDecimal sumFloatValue = this.getSumFloatValue();
         BigDecimal countElement = new BigDecimal(this.getElementsCount());
 
-        return sumFloatValue.divide(countElement, 2, RoundingMode.HALF_UP);
+        return sumFloatValue.divide(countElement, RoundingMode.HALF_UP);
     }
 
     /**

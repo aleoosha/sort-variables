@@ -1,6 +1,9 @@
 package org.SortVariables;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -60,6 +63,16 @@ public class InputCommand {
     private String outPath = "";
 
     /**
+     * Использовался ли флаг добавочного пути в командной строке
+     */
+    private boolean isOutPathFlagExists = false;
+
+    /**
+     * Использовался ли флаг добавочного префикса в командной строке
+     */
+    private boolean isOutPrefixFlagExists = false;
+
+    /**
      * Регулярное выражение для проверки пути до результирующих файлов
      */
     final String OUT_PATH_REGEX = "^\\/(?:[^<>:\"\\/\\\\|?*\\x00-\\x1F]{1,100}\\/?)+$";
@@ -95,42 +108,54 @@ public class InputCommand {
      * @param args Аргументы из командной строки
      */
     private void parseInputArgs(String[] args) {
+        List<String> argsList = new ArrayList<>(Arrays.asList(args));
+        ListIterator<String> iterator = argsList.listIterator();
 
         boolean nextElementContinue = false;
 
-        for (int i = 0; i < args.length; i++) {
+        while (iterator.hasNext()) {
+            String arg = iterator.next();
+
             if (nextElementContinue) {
                 nextElementContinue = false;
                 continue;
             }
 
-            String element = args[i];
+            int index = iterator.nextIndex();
 
-            switch (element) {
+            switch (arg) {
                 case "-s":
-                    this.setLastFlagIndex(i);
+                    this.setLastFlagIndex(index);
                     this.setIsBriefStat(true);
                     break;
                 case "-f":
-                    this.setLastFlagIndex(i);
+                    this.setLastFlagIndex(index);
                     this.setIsFullStat(true);
                     break;
                 case "-a":
-                    this.setLastFlagIndex(i);
+                    this.setLastFlagIndex(index);
                     this.setIsOutRewrite(false);
                     break;
                 case "-o":
-                    this.setLastFlagIndex(i);
+                    this.setLastFlagIndex(index);
+                    this.setIsOutPathFlagExists(true);
                     nextElementContinue = true;
-                    this.setOutPath(args[i + 1]);
+                    if (iterator.hasNext()) {
+                        this.setOutPath(iterator.next());
+                        iterator.previous();
+                    }
                     break;
                 case "-p":
-                    this.setLastFlagIndex(i);
+                    this.setLastFlagIndex(index);
+                    this.setIsOutPrefixFlagExists(true);
                     nextElementContinue = true;
-                    this.setOutPrefix(args[i + 1]);
+                    if (iterator.hasNext()) {
+                        this.setOutPrefix(iterator.next());
+                        iterator.previous();
+                    }
                     break;
                 default:
-                    this.filterOtherArguments(String.valueOf(i), element);
+                    this.filterOtherArguments(String.valueOf(index), arg);
             }
         }
     }
@@ -210,6 +235,12 @@ public class InputCommand {
     private void checkOutPath() {
         String outPath = this.getOutPath();
 
+        if (this.getIsOutPathFlagExists() && outPath.isEmpty()) {
+            this.setIsHasErrors(true);
+            this.addMessageErrorMessageList("Ошибка: не указан путь для создания результирующих файлов (после флага -o).");
+            this.addMessageErrorMessageList("");
+        }
+
         if (outPath.isEmpty()) {
             return;
         }
@@ -225,7 +256,8 @@ public class InputCommand {
         this.addMessageErrorMessageList("Ошибка в пути для создания результирующих файлов (после флага -o).");
         this.addMessageErrorMessageList("Возможные причины:");
         this.addMessageErrorMessageList("Запрещенные символы: <, >, :, \", \\, |, ?, *;");
-        this.addMessageErrorMessageList("Пустой путь - / или несколько / подряд;");
+        this.addMessageErrorMessageList("Пустой путь \"/\" или несколько \"/\" подряд;");
+        this.addMessageErrorMessageList("Путь начинается не с символа \"/\"");
         this.addMessageErrorMessageList("Количество символов больше 100.");
         this.addMessageErrorMessageList("");
 
@@ -236,6 +268,12 @@ public class InputCommand {
      */
     private void checkOutPrefix() {
         String outPrefix = this.getOutPrefix();
+
+        if (this.getIsOutPrefixFlagExists() && outPrefix.isEmpty()) {
+            this.setIsHasErrors(true);
+            this.addMessageErrorMessageList("Ошибка: не указан путь для создания результирующих файлов (после флага -o).");
+            this.addMessageErrorMessageList("");
+        }
 
         if (outPrefix.isEmpty()) {
             return;
@@ -306,7 +344,7 @@ public class InputCommand {
             }
 
             this.setIsHasErrors(true);
-            this.addMessageErrorMessageList("Указанный файл: " + listFilesPosition[i] + " не является текстовым документом.");
+            this.addMessageErrorMessageList("Указанный файл: \"" + listFilesPosition[i] + "\" не является текстовым документом.");
             this.addMessageErrorMessageList("");
 
         }
@@ -442,5 +480,21 @@ public class InputCommand {
 
     public void setIsHasErrors(boolean isHasErrors) {
         this.isHasErrors = isHasErrors;
+    }
+
+    public boolean getIsOutPathFlagExists() {
+        return isOutPathFlagExists;
+    }
+
+    public void setIsOutPathFlagExists(boolean isOutPathFlagExists) {
+        this.isOutPathFlagExists = isOutPathFlagExists;
+    }
+
+    public boolean getIsOutPrefixFlagExists() {
+        return isOutPrefixFlagExists;
+    }
+
+    public void setIsOutPrefixFlagExists(boolean isOutPrefixFlagExists) {
+        this.isOutPrefixFlagExists = isOutPrefixFlagExists;
     }
 }

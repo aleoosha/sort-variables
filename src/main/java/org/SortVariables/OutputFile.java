@@ -29,7 +29,7 @@ public class OutputFile {
     /**
      * Директория для сохранения результирующего файла по умолчанию
      */
-    final String OUTPUT_FILE_FOLDER = "/result-files";
+    final String OUTPUT_FILE_FOLDER = "";
 
     /**
      * Название файла

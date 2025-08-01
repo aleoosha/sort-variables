@@ -4,6 +4,11 @@ import java.util.Arrays;
 
 public class Main {
 
+    /**
+     * Отфильтровать данные из входящих файлов и вывести статистику по результату
+     *
+     * @param args Аргументы из командной строки
+     */
     public static void main(String[] args)
     {
         try {
