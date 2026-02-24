@@ -1,7 +1,5 @@
 package org.SortVariables;
 
-import java.io.IOException;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,26 +19,13 @@ public class ProcessedFile {
 
         Path path = Paths.get(System.getProperty("user.dir") + "/" + pathString);
 
-        try {
-            this.name = path.getFileName().toString();
-            this.directory = path.getParent().toString();
-            try (Stream<String> lines = Files.lines(path)) {
-                this.lineCount = lines.count();
-            } catch (NoSuchFileException e) {
-                this.lineCount = 0;
-            }
-        } catch (IOException e) {
-            System.err.println("Ошибка при обработке файла: " + e.getMessage());
-        }
+        this.name = path.getFileName().toString();
+        this.directory = path.getParent().toString();
 
         this.setFileExtension();
-
-        System.out.println(this.lineCount);
-        System.out.println(this.directory);
-
     }
 
-    private void setFileExtension() {
+    protected void setFileExtension() {
         this.extension = "";
         int i = this.name.lastIndexOf('.');
         if (i > 0) {

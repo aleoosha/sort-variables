@@ -2,6 +2,7 @@ package org.SortVariables;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,5 +52,25 @@ public class TXTFileHandler extends FileHandler {
         } catch (IOException e) {
             System.err.println("Файл уже существует или ошибка: " + e.getMessage());
         }
+    }
+
+    @Override
+    public long countLines() {
+        if (!this.checkExists()){
+            System.out.println("Файл не найден: " + this.processedFile.pathString);
+            return 0;
+        }
+
+        Path path = Paths.get(this.processedFile.directory + "/" + this.processedFile.name);
+
+        long lineCount = 0;
+
+        try (Stream<String> lines = Files.lines(path)) {
+            lineCount = lines.count();
+        } catch (IOException e) {
+            System.err.println("Ошибка при обработке файла: " + e.getMessage());
+        }
+
+        return lineCount;
     }
 }

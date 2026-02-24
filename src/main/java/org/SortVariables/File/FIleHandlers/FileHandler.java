@@ -19,6 +19,12 @@ public abstract class FileHandler {
 
     public abstract void createFileIfNotExists();
 
+    public abstract long countLines();
+
+    protected boolean checkExists(){
+        return Files.exists(Paths.get(this.processedFile.directory + "/" + this.processedFile.name));
+    }
+
     protected void createDirectory() {
         Path path = Paths.get(this.processedFile.directory);
 

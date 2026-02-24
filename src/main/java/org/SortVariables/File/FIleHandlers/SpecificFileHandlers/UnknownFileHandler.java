@@ -21,4 +21,15 @@ public class UnknownFileHandler extends FileHandler {
     public void createFileIfNotExists() {
         System.out.println("Ошибка создания файла: " + this.processedFile.pathString + ". Разрешение файла не поддерживается.");
     }
+
+    @Override
+    public long countLines() {
+        if (!this.checkExists()){
+            System.out.println("Файл не найден: " + this.processedFile.pathString);
+        } else {
+            System.out.println("Ошибка чтения файла: " + this.processedFile.pathString + ". Разрешение файла не поддерживается.");
+        }
+
+        return 0;
+    }
 }

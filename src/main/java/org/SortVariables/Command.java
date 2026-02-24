@@ -16,7 +16,7 @@ public class Command {
 
     private boolean isOutRewrite = true;
 
-    private List<ProcessedFile> inputFileList = new ArrayList<>();
+    private List<InputProcessedFile> inputFileList = new ArrayList<>();
 
     final String INT_FILE_NAME = "integers.txt";
 
@@ -63,7 +63,7 @@ public class Command {
                     }
                     break;
                 default:
-                    this.inputFileList.add(new ProcessedFile(arg));
+                    this.inputFileList.add(new InputProcessedFile(arg));
             }
         }
     }
@@ -108,7 +108,7 @@ public class Command {
 
         FileHandlerFactory fileHandlerFactory = new FileHandlerFactory();
 
-        for (ProcessedFile inputFile : this.inputFileList){
+        for (InputProcessedFile inputFile : this.inputFileList){
 
             FileHandler inputFileHandler = fileHandlerFactory.getFileHandler(inputFile);
 
