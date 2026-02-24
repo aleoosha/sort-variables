@@ -19,7 +19,7 @@ public class TXTFileHandler extends FileHandler {
         String line = null;
 
         try {
-            line = Files.lines(Paths.get(this.processedFile.directory + "/" + this.processedFile.name))
+            line = Files.lines(Paths.get(this.processedFile.getDirectory() + "/" + this.processedFile.getName()))
                     .skip(lineNumber - 1)
                     .findFirst()
                     .orElse(null);
@@ -33,7 +33,7 @@ public class TXTFileHandler extends FileHandler {
     @Override
     public void writeLine(String line) {
         try (FileWriter writer =
-                     new FileWriter(this.processedFile.directory + "/" + this.processedFile.name, true)) {
+                     new FileWriter(this.processedFile.getDirectory() + "/" + this.processedFile.getName(), true)) {
             writer.write(line + System.lineSeparator());
         } catch (IOException e) {
             System.err.println("Ошибка записи: " + e.getMessage());
@@ -44,7 +44,7 @@ public class TXTFileHandler extends FileHandler {
     public void createFileIfNotExists() {
         this.createDirectory();
 
-        Path path = Paths.get(System.getProperty("user.dir") + "/" + this.processedFile.pathString);
+        Path path = Paths.get(System.getProperty("user.dir") + "/" + this.processedFile.getPathString());
         try {
             if (!Files.exists(path)) {
                 Files.createFile(path);
@@ -57,11 +57,11 @@ public class TXTFileHandler extends FileHandler {
     @Override
     public long countLines() {
         if (!this.checkExists()){
-            System.out.println("Файл не найден: " + this.processedFile.pathString);
+            System.out.println("Файл не найден: " + this.processedFile.getPathString());
             return 0;
         }
 
-        Path path = Paths.get(this.processedFile.directory + "/" + this.processedFile.name);
+        Path path = Paths.get(this.processedFile.getDirectory() + "/" + this.processedFile.getName());
 
         long lineCount = 0;
 

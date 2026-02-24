@@ -5,9 +5,9 @@ import java.io.IOException;
 
 public abstract class LineHandler {
     protected LineHandler next;
-    protected ProcessedFile outputFile;
+    protected OutputProcessedFile outputFile;
 
-    public LineHandler(ProcessedFile outputFile) {
+    public LineHandler(OutputProcessedFile outputFile) {
         this.outputFile = outputFile;
     }
 

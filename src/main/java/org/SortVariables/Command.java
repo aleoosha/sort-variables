@@ -24,11 +24,11 @@ public class Command {
 
     final String STRING_FILE_NAME = "strings.txt";
 
-    private ProcessedFile intOutputFile;
+    private OutputProcessedFile intOutputFile;
 
-    private ProcessedFile floatOutputFile;
+    private OutputProcessedFile floatOutputFile;
 
-    private ProcessedFile stringOutputFile;
+    private OutputProcessedFile stringOutputFile;
 
     public Command(String[] args) {
         this.setInputArgs(args);
@@ -76,14 +76,17 @@ public class Command {
     }
 
     private void setOutputFiles(){
-        this.intOutputFile = new ProcessedFile(
-                Objects.toString(this.outPath, "") + "/" + Objects.toString(this.outPrefix, "") + this.INT_FILE_NAME
+        this.intOutputFile = new OutputProcessedFile(
+                Objects.toString(this.outPath, "") + "/" + Objects.toString(this.outPrefix, "") + this.INT_FILE_NAME,
+                "int"
         );
-        this.floatOutputFile = new ProcessedFile(
-                Objects.toString(this.outPath, "") + "/" + Objects.toString(this.outPrefix, "") + this.FLOAT_FILE_NAME
+        this.floatOutputFile = new OutputProcessedFile(
+                Objects.toString(this.outPath, "") + "/" + Objects.toString(this.outPrefix, "") + this.FLOAT_FILE_NAME,
+                "float"
         );
-        this.stringOutputFile = new ProcessedFile(
-                Objects.toString(this.outPath, "") + "/" + Objects.toString(this.outPrefix, "") + this.STRING_FILE_NAME
+        this.stringOutputFile = new OutputProcessedFile(
+                Objects.toString(this.outPath, "") + "/" + Objects.toString(this.outPrefix, "") + this.STRING_FILE_NAME,
+                "string"
         );
     }
 
@@ -112,7 +115,7 @@ public class Command {
 
             FileHandler inputFileHandler = fileHandlerFactory.getFileHandler(inputFile);
 
-            for (int line = 1; line <= inputFile.lineCount; line++) {
+            for (int line = 1; line <= inputFile.getLineCount(); line++) {
                 String fileLine = inputFileHandler.readLine(line);
                 intHandler.handle(fileLine);
             }

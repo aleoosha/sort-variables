@@ -7,12 +7,11 @@ import java.util.stream.Stream;
 
 public class ProcessedFile {
 
-    public String name;
-    public String directory;
-    public String fileAbsolutePath;
-    public String extension;
-    public String pathString;
-    public long lineCount;
+    private String name;
+    private String directory;
+    private String fileAbsolutePath;
+    private String extension;
+    private String pathString;
 
     public ProcessedFile(String pathString) {
         this.pathString = pathString;
@@ -31,5 +30,25 @@ public class ProcessedFile {
         if (i > 0) {
             this.extension = this.name.substring(i + 1);
         }
+    }
+
+    public String getName(){
+        return this.name;
+    }
+
+    public String getDirectory(){
+        return this.directory;
+    }
+
+    public String getFileAbsolutePath(){
+        return this.fileAbsolutePath;
+    }
+
+    public String getExtension(){
+        return this.extension;
+    }
+
+    public String getPathString(){
+        return this.pathString;
     }
 }

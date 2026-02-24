@@ -2,7 +2,7 @@ package org.SortVariables;
 
 class FloatHandler extends LineHandler {
 
-    public FloatHandler(ProcessedFile outputFile) {
+    public FloatHandler(OutputProcessedFile outputFile) {
         super(outputFile);
     }
 

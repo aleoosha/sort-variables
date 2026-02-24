@@ -22,11 +22,11 @@ public abstract class FileHandler {
     public abstract long countLines();
 
     protected boolean checkExists(){
-        return Files.exists(Paths.get(this.processedFile.directory + "/" + this.processedFile.name));
+        return Files.exists(Paths.get(this.processedFile.getDirectory() + "/" + this.processedFile.getName()));
     }
 
     protected void createDirectory() {
-        Path path = Paths.get(this.processedFile.directory);
+        Path path = Paths.get(this.processedFile.getDirectory());
 
         try {
             if (!Files.isDirectory(path)) {
@@ -38,7 +38,7 @@ public abstract class FileHandler {
     }
 
     public void deleteIfExists() {
-        Path filePath = Paths.get(this.processedFile.directory + "/" + this.processedFile.name);
+        Path filePath = Paths.get(this.processedFile.getDirectory() + "/" + this.processedFile.getName());
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {

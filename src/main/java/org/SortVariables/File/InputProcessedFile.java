@@ -2,7 +2,7 @@ package org.SortVariables;
 
 public class InputProcessedFile extends ProcessedFile {
 
-    public long lineCount;
+    private long lineCount;
 
     public InputProcessedFile(String pathString) {
         super(pathString);
@@ -15,5 +15,9 @@ public class InputProcessedFile extends ProcessedFile {
         FileHandler fileHandler = fileHandlerFactory.getFileHandler(this);
 
         this.lineCount = fileHandler.countLines();
+    }
+
+    public long getLineCount(){
+        return this.lineCount;
     }
 }
