@@ -1,7 +1,12 @@
 package org.SortVariables;
 
-public class FloatBriefStatisticStrategy implements StatisticStrategy {
-    public void calculate(OutputProcessedFile outpuFile){
+public class FloatBriefStatisticStrategy extends BaseBriefStatisticStrategy implements StatisticStrategy {
 
+    public FloatBriefStatisticStrategy(OutputProcessedFile outpuFile){
+        super(outpuFile);
+    }
+
+    public void calculate(){
+        super.calculate();
     }
 }

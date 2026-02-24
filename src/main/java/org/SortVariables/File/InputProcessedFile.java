@@ -11,9 +11,7 @@ public class InputProcessedFile extends ProcessedFile {
 
     private void setLineCount() {
         FileHandlerFactory fileHandlerFactory = new FileHandlerFactory();
-
         FileHandler fileHandler = fileHandlerFactory.getFileHandler(this);
-
         this.lineCount = fileHandler.countLines();
     }
 

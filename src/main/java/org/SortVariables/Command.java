@@ -12,7 +12,7 @@ public class Command {
 
     private String outPath;
 
-    private String statFlag;
+    private String statisticType;
 
     private boolean isOutRewrite = true;
 
@@ -46,8 +46,10 @@ public class Command {
 
             switch (arg) {
                 case "-s":
+                    this.statisticType = "brief";
+                    break;
                 case "-f":
-                    this.statFlag = arg;
+                    this.statisticType = "full";
                     break;
                 case "-a":
                     this.isOutRewrite = false;
@@ -69,13 +71,14 @@ public class Command {
     }
 
     public void execute() {
-        if (this.isOutRewrite){
+        if (this.isOutRewrite) {
             this.deleteOldOutputFiles();
         }
         this.handleInputFiles();
+        this.calculateStatistic();
     }
 
-    private void setOutputFiles(){
+    private void setOutputFiles() {
         this.intOutputFile = new OutputProcessedFile(
                 Objects.toString(this.outPath, "") + "/" + Objects.toString(this.outPrefix, "") + this.INT_FILE_NAME,
                 "int"
@@ -90,7 +93,7 @@ public class Command {
         );
     }
 
-    private void deleteOldOutputFiles(){
+    private void deleteOldOutputFiles() {
         FileHandlerFactory fileHandlerFactory = new FileHandlerFactory();
         FileHandler intFileHandler = fileHandlerFactory.getFileHandler(this.intOutputFile);
         FileHandler floatFileHandler = fileHandlerFactory.getFileHandler(this.floatOutputFile);
@@ -101,7 +104,7 @@ public class Command {
         stringFileHandler.deleteIfExists();
     }
 
-    private void handleInputFiles(){
+    private void handleInputFiles() {
         LineHandler intHandler = new IntegerHandler(this.intOutputFile);
         LineHandler floatHandler = new FloatHandler(this.floatOutputFile);
         LineHandler stringHandler = new StringHandler(this.stringOutputFile);
@@ -111,7 +114,7 @@ public class Command {
 
         FileHandlerFactory fileHandlerFactory = new FileHandlerFactory();
 
-        for (InputProcessedFile inputFile : this.inputFileList){
+        for (InputProcessedFile inputFile : this.inputFileList) {
 
             FileHandler inputFileHandler = fileHandlerFactory.getFileHandler(inputFile);
 
@@ -120,5 +123,19 @@ public class Command {
                 intHandler.handle(fileLine);
             }
         }
+    }
+
+    private void calculateStatistic() {
+        StatisticStrategyFactory statisticStrategyFactory = new StatisticStrategyFactory();
+        StatisticStrategy intStatisticStrategy = statisticStrategyFactory
+                .getStatisticStrategy(this.intOutputFile, this.statisticType);
+        StatisticStrategy floatStatisticStrategy = statisticStrategyFactory
+                .getStatisticStrategy(this.floatOutputFile, this.statisticType);
+        StatisticStrategy stringStatisticStrategy = statisticStrategyFactory
+                .getStatisticStrategy(this.stringOutputFile, this.statisticType);
+
+        intStatisticStrategy.calculate();
+        floatStatisticStrategy.calculate();
+        stringStatisticStrategy.calculate();
     }
 }

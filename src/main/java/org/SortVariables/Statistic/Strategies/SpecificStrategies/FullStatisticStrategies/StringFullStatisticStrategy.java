@@ -1,7 +1,13 @@
 package org.SortVariables;
 
 public class StringFullStatisticStrategy extends StringBriefStatisticStrategy implements StatisticStrategy {
-    public void calculate(OutputProcessedFile outpuFile){
+
+    public StringFullStatisticStrategy(OutputProcessedFile outpuFile){
+        super(outpuFile);
+    }
+
+    public void calculate(){
+        super.calculate();
 
     }
 }
