@@ -19,7 +19,7 @@ public abstract class FileHandler {
 
     public abstract void createFileIfNotExists();
 
-    public abstract long countLines();
+    public abstract Long countLines();
 
     protected boolean checkExists(){
         return Files.exists(Paths.get(this.processedFile.getDirectory() + "/" + this.processedFile.getName()));

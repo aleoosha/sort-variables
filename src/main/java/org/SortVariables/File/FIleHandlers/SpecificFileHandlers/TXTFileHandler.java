@@ -55,18 +55,18 @@ public class TXTFileHandler extends FileHandler {
     }
 
     @Override
-    public long countLines() {
+    public Long countLines() {
         if (!this.checkExists()){
             System.out.println("Файл не найден: " + this.processedFile.getPathString());
-            return 0;
+            return null;
         }
 
         Path path = Paths.get(this.processedFile.getDirectory() + "/" + this.processedFile.getName());
 
-        long lineCount = 0;
+        Long lineCount = null;
 
         try (Stream<String> lines = Files.lines(path)) {
-            lineCount = lines.count();
+            lineCount = Long.valueOf(lines.count());
         } catch (IOException e) {
             System.err.println("Ошибка при обработке файла: " + e.getMessage());
         }

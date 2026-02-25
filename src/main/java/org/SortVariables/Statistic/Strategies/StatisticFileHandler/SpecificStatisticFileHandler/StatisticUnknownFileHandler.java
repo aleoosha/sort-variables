@@ -7,9 +7,21 @@ public class StatisticUnknownFileHandler extends StatisticFileHandler {
     }
 
     @Override
-    public long countLines() {
+    public Long countLines() {
         System.out.println("Ошибка чтения файла: " + this.outputProcessedFile.getPathString() + ". Разрешение файла не поддерживается.");
 
-        return 0;
+        return null;
+    }
+
+    protected Double findMin(){
+        return null;
+    }
+
+    protected Double findMax(){
+        return null;
+    }
+
+    protected Double findSum(){
+        return null;
     }
 }

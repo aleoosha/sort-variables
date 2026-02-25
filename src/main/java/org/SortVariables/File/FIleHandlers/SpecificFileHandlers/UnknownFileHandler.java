@@ -23,13 +23,13 @@ public class UnknownFileHandler extends FileHandler {
     }
 
     @Override
-    public long countLines() {
+    public Long countLines() {
         if (!this.checkExists()){
             System.out.println("Файл не найден: " + this.processedFile.getPathString());
         } else {
             System.out.println("Ошибка чтения файла: " + this.processedFile.getPathString() + ". Разрешение файла не поддерживается.");
         }
 
-        return 0;
+        return null;
     }
 }

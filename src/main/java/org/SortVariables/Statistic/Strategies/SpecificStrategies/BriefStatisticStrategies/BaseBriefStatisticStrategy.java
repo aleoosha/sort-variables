@@ -3,7 +3,7 @@ package org.SortVariables;
 public abstract class BaseBriefStatisticStrategy {
 
     protected OutputProcessedFile outpuFile;
-    protected long countElements;
+    protected Long countElements;
     protected StatisticFileHandler statisticFileHandler;
 
     public BaseBriefStatisticStrategy(OutputProcessedFile outpuFile){
@@ -23,8 +23,8 @@ public abstract class BaseBriefStatisticStrategy {
     }
 
     private void calculateElements(){
-        this.countElements = this.statisticFileHandler.countLines();
-        System.out.println("Количество элементов: " + this.countElements);
+        this.countElements = this.statisticFileHandler.getOrSetCountLines();
+        System.out.println("Количество элементов: " + this.countElements.longValue());
     }
 
     private void printTitle(){

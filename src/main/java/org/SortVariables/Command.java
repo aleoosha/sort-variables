@@ -118,7 +118,11 @@ public class Command {
 
             FileHandler inputFileHandler = fileHandlerFactory.getFileHandler(inputFile);
 
-            for (int line = 1; line <= inputFile.getLineCount(); line++) {
+            Long lineCount = inputFile.getLineCount();
+
+            if (lineCount == null) { continue; }
+
+            for (int line = 1; line <= inputFile.getLineCount().longValue(); line++) {
                 String fileLine = inputFileHandler.readLine(line);
                 intHandler.handle(fileLine);
             }
